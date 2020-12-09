@@ -14,7 +14,7 @@ namespace Umbraco.Core.Security
     {
         // TODO: Ideally we remove this class and only deal with ClaimsIdentity as a best practice. All things relevant to our own
         // identity are part of claims. This class would essentially become extension methods on a ClaimsIdentity for resolving
-        // values from it. 
+        // values from it.
         public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
             // validate that all claims exist
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Security
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         {
-            //This is the id that 'identity' uses to check for the user id
+            // This is the id that 'identity' uses to check for the user id
             if (HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
                 AddClaim(new Claim(ClaimTypes.NameIdentifier, userId, ClaimValueTypes.String, Issuer, Issuer, this));
 
