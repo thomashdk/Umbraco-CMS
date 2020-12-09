@@ -22,7 +22,7 @@ using Umbraco.Web.Common.Security;
 namespace Umbraco.Web.BackOffice.Filters
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     internal sealed class CheckIfUserTicketDataIsStaleAttribute : TypeFilterAttribute
     {
@@ -106,13 +106,13 @@ namespace Umbraco.Web.BackOffice.Filters
                     return;
                 }
 
-                var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
+                var identity = actionContext.HttpContext.User.Identity as ClaimsIdentity;
                 if (identity == null)
                 {
                     return;
                 }
 
-                Attempt<int> userId = identity.Id.TryConvertTo<int>();
+                Attempt<int> userId = identity.GetId().TryConvertTo<int>();
                 if (userId == false)
                 {
                     return;
@@ -127,23 +127,23 @@ namespace Umbraco.Web.BackOffice.Filters
                 // a list of checks to execute, if any of them pass then we resync
                 var checks = new Func<bool>[]
                 {
-                    () => user.Username != identity.Username,
+                    () => user.Username != identity.GetUsername(),
                     () =>
                     {
                         CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
-                        return culture != null && culture.ToString() != identity.Culture;
+                        return culture != null && culture.ToString() != identity.GetCulture();
                     },
-                    () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
-                    () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
+                    () => user.AllowedSections.UnsortedSequenceEqual(identity.GetAllowedApplications()) == false,
+                    () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.GetRoles()) == false,
                     () =>
                     {
                         var startContentIds = user.CalculateContentStartNodeIds(_entityService);
-                        return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
+                        return startContentIds.UnsortedSequenceEqual(identity.GetStartContentNodes()) == false;
                     },
                     () =>
                     {
                         var startMediaIds = user.CalculateMediaStartNodeIds(_entityService);
-                        return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
+                        return startMediaIds.UnsortedSequenceEqual(identity.GetStartMediaNodes()) == false;
                     }
                 };
 

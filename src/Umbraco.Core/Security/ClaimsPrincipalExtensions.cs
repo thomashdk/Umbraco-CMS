@@ -19,17 +19,17 @@ namespace Umbraco.Extensions
         {
             // TODO: It would be nice to get rid of this and only rely on Claims, not a strongly typed identity instance
 
-            //If it's already a UmbracoBackOfficeIdentity
+            // If it's already a UmbracoBackOfficeIdentity
             if (user.Identity is UmbracoBackOfficeIdentity backOfficeIdentity) return backOfficeIdentity;
 
-            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
+            // Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
             if (user is ClaimsPrincipal claimsPrincipal)
             {
                 backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
                 if (backOfficeIdentity != null) return backOfficeIdentity;
             }
 
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
+            // Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
             if (user.Identity is ClaimsIdentity claimsIdentity
                 && claimsIdentity.IsAuthenticated
                 && UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var umbracoIdentity))
@@ -56,10 +56,16 @@ namespace Umbraco.Extensions
         public static double GetRemainingAuthSeconds(this IPrincipal user, DateTimeOffset now)
         {
             var claimsPrincipal = user as ClaimsPrincipal;
-            if (claimsPrincipal == null) return 0;
+            if (claimsPrincipal == null)
+            {
+                return 0;
+            }
 
             var ticketExpires = claimsPrincipal.FindFirst(Constants.Security.TicketExpiresClaimType)?.Value;
-            if (ticketExpires.IsNullOrWhiteSpace()) return 0;
+            if (ticketExpires.IsNullOrWhiteSpace())
+            {
+                return 0;
+            }
 
             var utcExpired = DateTimeOffset.Parse(ticketExpires, null, DateTimeStyles.RoundtripKind);
 

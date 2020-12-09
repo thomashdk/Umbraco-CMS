@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 
@@ -10,6 +13,42 @@ namespace Umbraco.Core.Security
     public static class ClaimsIdentityExtensions
     {
         private static string _issuer = Constants.Security.BackOfficeAuthenticationType;
+
+        /// <summary>
+        /// Gets the required claim types for a back office identity
+        /// </summary>
+        /// <remarks>
+        /// This does not include the role claim type or allowed apps type since that is a collection and in theory could be empty
+        /// </remarks>
+        public static IEnumerable<string> RequiredBackOfficeIdentityClaimTypes => new[]
+        {
+            ClaimTypes.NameIdentifier, // id
+            ClaimTypes.Name, // username
+            ClaimTypes.GivenName,
+            Constants.Security.StartContentNodeIdClaimType,
+            Constants.Security.StartMediaNodeIdClaimType,
+            ClaimTypes.Locality,
+            Constants.Security.SecurityStampClaimType
+        };
+
+        /// <summary>
+        /// Validates that the ClaimsIdentity has all the required claims to be used for backoffice.
+        /// </summary>
+        /// <param name="identity">Identity to verify</param>
+        /// <returns>Returns true if the identity has all required claims.</returns>
+        public static bool HasRequiredBackofficeClaims(this ClaimsIdentity identity)
+        {
+            foreach (var claimType in RequiredBackOfficeIdentityClaimTypes)
+            {
+                if (identity.HasClaim(x => x.Type == claimType) == false ||
+                    identity.HasClaim(x => x.Type == claimType && x.Value.IsNullOrWhiteSpace()))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Adds required claims for Umbraco backoffice.
@@ -193,6 +232,5 @@ namespace Umbraco.Core.Security
         public static string[] GetRoles(this ClaimsIdentity claimsIdentity) => claimsIdentity
             .FindAll(x => x.Type == ClaimsIdentity.DefaultRoleClaimType)
             .Select(role => role.Value).ToArray();
-
     }
 }

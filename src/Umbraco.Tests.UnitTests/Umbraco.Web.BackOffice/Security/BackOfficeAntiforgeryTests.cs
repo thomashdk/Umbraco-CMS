@@ -21,7 +21,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
         {
             var httpContext = new DefaultHttpContext()
             {
-                User = new ClaimsPrincipal(new UmbracoBackOfficeIdentity(
+                User = new ClaimsPrincipal(new ClaimsIdentity().AddRequiredBackofficeClaims(
                     Constants.Security.SuperUserIdAsString,
                     "test",
                     "test",

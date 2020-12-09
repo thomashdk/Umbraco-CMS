@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -25,9 +26,9 @@ namespace Umbraco.Core.Security
 
         public static CultureInfo GetCulture(this IIdentity identity)
         {
-            if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
+            if (identity is ClaimsIdentity umbIdentity && umbIdentity.IsAuthenticated)
             {
-                return UserCultures.GetOrAdd(umbIdentity.Culture, s => new CultureInfo(s));
+                return UserCultures.GetOrAdd(umbIdentity.GetCulture(), s => new CultureInfo(s));
             }
 
             return null;

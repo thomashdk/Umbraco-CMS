@@ -19,7 +19,7 @@ namespace Umbraco.Web.BackOffice.Security
             _loginTimeoutMinutes = loginTimeoutMinutes;
             _ticketDataFormat = ticketDataFormat ?? throw new ArgumentNullException(nameof(ticketDataFormat));
         }
-        
+
         public string Protect(AuthenticationTicket data, string purpose)
         {
             // create a new ticket based on the passed in tickets details, however, we'll adjust the expires utc based on the specified timeout mins
@@ -38,13 +38,14 @@ namespace Umbraco.Web.BackOffice.Security
 
         public string Protect(AuthenticationTicket data) => Protect(data, string.Empty);
 
-        
+
         public AuthenticationTicket Unprotect(string protectedText) => Unprotect(protectedText, string.Empty);
 
         /// <summary>
         /// Un-protects the cookie
         /// </summary>
         /// <param name="protectedText"></param>
+        /// <param name="purpose"></param>
         /// <returns></returns>
         public AuthenticationTicket Unprotect(string protectedText, string purpose)
         {
@@ -52,7 +53,10 @@ namespace Umbraco.Web.BackOffice.Security
             try
             {
                 decrypt = _ticketDataFormat.Unprotect(protectedText);
-                if (decrypt == null) return null;
+                if (decrypt == null)
+                {
+                    return null;
+                }
             }
             catch (Exception)
             {
@@ -60,9 +64,11 @@ namespace Umbraco.Web.BackOffice.Security
             }
 
             if (!UmbracoBackOfficeIdentity.FromClaimsIdentity((ClaimsIdentity)decrypt.Principal.Identity, out var identity))
+            {
                 return null;
+            }
 
-            //return the ticket with a UmbracoBackOfficeIdentity
+            // return the ticket with a UmbracoBackOfficeIdentity
             var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), decrypt.Properties, decrypt.AuthenticationScheme);
 
             return ticket;
