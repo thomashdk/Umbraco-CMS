@@ -72,7 +72,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var claimsPrincipal = await sut.CreateAsync(_testUser);
 
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue.ToString()));
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue.ToString()));
+            Assert.True(claimsPrincipal.VerifyBackOfficeIdentity().HasClaim(expectedClaimType, expectedClaimValue.ToString()));
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             var claimsPrincipal = await sut.CreateAsync(_testUser);
 
             Assert.True(claimsPrincipal.HasClaim(expectedClaimType, expectedClaimValue));
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
+            Assert.True(claimsPrincipal.VerifyBackOfficeIdentity().HasClaim(expectedClaimType, expectedClaimValue));
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 
             var claimsPrincipal = await sut.CreateAsync(_testUser);
 
-            Assert.True(claimsPrincipal.GetUmbracoIdentity().HasClaim(expectedClaimType, expectedClaimValue));
+            Assert.True(claimsPrincipal.VerifyBackOfficeIdentity().HasClaim(expectedClaimType, expectedClaimValue));
         }
 
         [SetUp]

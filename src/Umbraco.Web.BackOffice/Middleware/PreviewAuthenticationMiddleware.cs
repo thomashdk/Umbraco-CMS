@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -56,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Middleware
                         AuthenticationTicket unprotected = cookieOptions.TicketDataFormat.Unprotect(cookie);
                         if (unprotected != null)
                         {
-                            var backOfficeIdentity = unprotected.Principal.GetUmbracoIdentity();
+                            ClaimsIdentity backOfficeIdentity = unprotected.Principal.VerifyBackOfficeIdentity();
                             if (backOfficeIdentity != null)
                             {
                                 // Ok, we've got a real ticket, now we can add this ticket's identity to the current

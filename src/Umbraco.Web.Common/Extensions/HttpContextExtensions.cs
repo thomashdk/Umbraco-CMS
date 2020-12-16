@@ -35,14 +35,24 @@ namespace Umbraco.Extensions
         /// <returns>
         /// Returns the current back office identity if an admin is authenticated otherwise null
         /// </returns>
-        public static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContext http)
+        public static ClaimsIdentity GetCurrentIdentity(this HttpContext http)
         {
-            if (http == null) throw new ArgumentNullException(nameof(http));
-            if (http.User == null) return null; // there's no user at all so no identity
+            if (http == null)
+            {
+                throw new ArgumentNullException(nameof(http));
+            }
+
+            if (http.User == null)
+            {
+                return null; // there's no user at all so no identity
+            }
 
             // If it's already a UmbracoBackOfficeIdentity
-            var backOfficeIdentity = http.User.GetUmbracoIdentity();
-            if (backOfficeIdentity != null) return backOfficeIdentity;
+            var backOfficeIdentity = http.User.VerifyBackOfficeIdentity();
+            if (backOfficeIdentity != null)
+            {
+                return backOfficeIdentity;
+            }
 
             return null;
         }

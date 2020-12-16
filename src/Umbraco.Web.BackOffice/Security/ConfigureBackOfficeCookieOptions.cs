@@ -135,7 +135,7 @@ namespace Umbraco.Web.BackOffice.Security
                     // Same goes for the signinmanager
                     IBackOfficeSignInManager signInManager = ctx.HttpContext.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
 
-                    UmbracoBackOfficeIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    ClaimsIdentity backOfficeIdentity = ctx.Principal.VerifyBackOfficeIdentity();
                     if (backOfficeIdentity == null)
                     {
                         ctx.RejectPrincipal();
@@ -162,7 +162,7 @@ namespace Umbraco.Web.BackOffice.Security
                 OnSigningIn = ctx =>
                 {
                     // occurs when sign in is successful but before the ticket is written to the outbound cookie
-                    UmbracoBackOfficeIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    ClaimsIdentity backOfficeIdentity = ctx.Principal.VerifyBackOfficeIdentity();
                     if (backOfficeIdentity != null)
                     {
                         // generate a session id and assign it
