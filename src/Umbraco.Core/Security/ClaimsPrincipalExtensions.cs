@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
@@ -10,6 +11,23 @@ namespace Umbraco.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
+        /// <summary>
+        /// Gets the required claim types for a back office identity
+        /// </summary>
+        /// <remarks>
+        /// This does not include the role claim type or allowed apps type since that is a collection and in theory could be empty
+        /// </remarks>
+        public static IEnumerable<string> RequiredBackOfficeIdentityClaimTypes => new[]
+        {
+            ClaimTypes.NameIdentifier, // id
+            ClaimTypes.Name,  // username
+            ClaimTypes.GivenName,
+            Constants.Security.StartContentNodeIdClaimType,
+            Constants.Security.StartMediaNodeIdClaimType,
+            ClaimTypes.Locality,
+            Constants.Security.SecurityStampClaimType
+        };
+
         /// <summary>
         /// This will return the current back office identity if the IPrincipal is the correct type
         /// </summary>
@@ -38,6 +56,38 @@ namespace Umbraco.Extensions
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Verifies that a principal objects contains a valid and authenticated ClaimsIdentity for backoffice.
+        /// </summary>
+        /// <param name="user">Extended principal</param>
+        /// <returns>A valid and authenticated ClaimsIdentity</returns>
+        public static ClaimsIdentity VerifyBackOfficeIdentity(this IPrincipal user)
+        {
+            if (!(user.Identity is ClaimsIdentity claimsIdentity))
+            {
+                // If the identity type is not ClaimsIdentity it's not a BackOfficeIdentity.
+                return null;
+            }
+
+            if (!claimsIdentity.IsAuthenticated)
+            {
+                // If the identity isn't authenticated count it as invalid.
+                return null;
+            }
+
+            foreach (var claimType in RequiredBackOfficeIdentityClaimTypes)
+            {
+                // If the identity doesn't have the claim or if the value is null it's not a valid BackOfficeIdentity.
+                if (claimsIdentity.HasClaim(x => x.Type == claimType) == false
+                    || claimsIdentity.HasClaim(x => x.Type == claimType && x.Value.IsNullOrWhiteSpace()))
+                {
+                    return null;
+                }
+            }
+
+            return claimsIdentity;
         }
 
         /// <summary>
