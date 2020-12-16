@@ -68,19 +68,5 @@ namespace Umbraco.Core.Security
         /// The type of authenticated identity. This property always returns "UmbracoBackOffice".
         /// </returns>
         public override string AuthenticationType => Issuer;
-
-        /// <summary>
-        /// Overridden to remove any temporary claims that shouldn't be copied
-        /// </summary>
-        /// <returns></returns>
-        public override ClaimsIdentity Clone()
-        {
-            var clone = base.Clone();
-
-            foreach (var claim in clone.FindAll(x => x.Type == Constants.Security.TicketExpiresClaimType).ToList())
-                clone.RemoveClaim(claim);
-
-            return clone;
-        }
     }
 }
