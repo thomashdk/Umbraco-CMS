@@ -26,7 +26,7 @@ namespace Umbraco.Core.Security
 
         /// <inheritdoc />
         /// <remarks>
-        /// Returns a custom <see cref="UmbracoBackOfficeIdentity"/> and allows flowing claims from the external identity
+        /// Returns ClaimsPrincipal with the required claims for backoffice and allows flowing claims from the external identity
         /// </remarks>
         public override async Task<ClaimsPrincipal> CreateAsync(BackOfficeIdentityUser user)
         {

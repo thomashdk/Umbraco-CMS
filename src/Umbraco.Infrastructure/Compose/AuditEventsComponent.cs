@@ -25,14 +25,16 @@ namespace Umbraco.Core.Compose
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IIpResolver _ipResolver;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly GlobalSettings _globalSettings;
 
-        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IOptions<GlobalSettings> globalSettings)
+        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IOptions<GlobalSettings> globalSettings, IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _auditService = auditService;
             _userService = userService;
             _entityService = entityService;
             _ipResolver = ipResolver;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _globalSettings = globalSettings.Value;
         }
 
@@ -40,8 +42,8 @@ namespace Umbraco.Core.Compose
         {
             get
             {
-                UmbracoBackOfficeIdentity identity = Thread.CurrentPrincipal?.GetUmbracoIdentity();
-                IUser user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.GetId()));
+                // TODO: Test and make sure this works.
+                IUser user = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
                 return user ?? UnknownUser(_globalSettings);
             }
         }

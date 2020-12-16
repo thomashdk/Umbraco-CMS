@@ -22,41 +22,11 @@ namespace Umbraco.Extensions
             ClaimTypes.NameIdentifier, // id
             ClaimTypes.Name,  // username
             ClaimTypes.GivenName,
-            Constants.Security.StartContentNodeIdClaimType,
-            Constants.Security.StartMediaNodeIdClaimType,
+            // Constants.Security.StartContentNodeIdClaimType, are these actually required? They aren't set in the tests.
+            // Constants.Security.StartMediaNodeIdClaimType,
             ClaimTypes.Locality,
             Constants.Security.SecurityStampClaimType
         };
-
-        /// <summary>
-        /// This will return the current back office identity if the IPrincipal is the correct type
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
-        {
-            // TODO: It would be nice to get rid of this and only rely on Claims, not a strongly typed identity instance
-
-            // If it's already a UmbracoBackOfficeIdentity
-            if (user.Identity is UmbracoBackOfficeIdentity backOfficeIdentity) return backOfficeIdentity;
-
-            // Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
-            if (user is ClaimsPrincipal claimsPrincipal)
-            {
-                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
-                if (backOfficeIdentity != null) return backOfficeIdentity;
-            }
-
-            // Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
-            if (user.Identity is ClaimsIdentity claimsIdentity
-                && claimsIdentity.IsAuthenticated
-                && UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var umbracoIdentity))
-            {
-                return umbracoIdentity;
-            }
-
-            return null;
-        }
 
         /// <summary>
         /// Verifies that a principal objects contains a valid and authenticated ClaimsIdentity for backoffice.
